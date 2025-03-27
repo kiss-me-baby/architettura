@@ -1,0 +1,62 @@
+#include<stdio.h>
+
+/*DA FINIRE*/
+void main() {
+	char stringa[] = "questa è una stringa";
+	int lunghezza = sizeof(stringa) - 1;
+	char carattere = "è";
+	int posizione;
+
+	__asm {
+					XOR ECX, ECX; indice
+					MOV EBX, lunghezza
+					MOV AH, carattere
+
+					CMP ECX, EBX
+					JGE fine
+					MOV AL, stringa[EBX]
+					CMP AH, AL
+					JE trovato
+					MOV stringa[EBX], stringa[EBX + 1]
+
+		fine:		MOV ECX, -1
+		trovato :	MOV posizione, ECX
+
+
+	}
+
+	printf("Posizione = %d\n", posizione);
+}
+
+/*void main() {
+	unsigned int num = 0x4;
+	unsigned int ris = 0;
+
+	__asm {
+					MOV EAX, num
+					MOV EBX, ris
+					MOV EBX, 0
+					
+
+					CMP EAX, 0
+					JE fine
+
+					SHL EAX, 1
+
+		shiftdx:	SHR EAX, 1
+					TEST EAX, 1
+					JE shiftdx
+
+					CMP EAX, 1
+					JE multiplo
+					JNE fine
+
+		multiplo:	MOV ris, 1
+
+
+		fine:		
+
+	}
+
+	printf("Risultato = %d\n", ris);
+}*/
