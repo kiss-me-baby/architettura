@@ -1,0 +1,71 @@
+#include<stdio.h>
+
+/*void main() {
+    int vettore[] = {-22, -11};
+    unsigned int lung = sizeof(vettore) / sizeof(int);
+    int somma;
+    int media;
+
+    __asm {
+
+                MOV EBX, lung 
+                XOR EAX, EAX
+
+ciclo:          DEC EBX                
+                ADD EAX, vettore[EBX * 4]
+                CMP EBX, 0
+                JNE ciclo
+
+                MOV somma, EAX
+                MOV EDX, 0
+                CDQ; Estende EAX in EDX : EAX mantenendo il segno
+                MOV ECX, lung
+                IDIV ECX
+                MOV media, EAX
+    }
+
+    printf("somma = %d\n", somma);
+    printf("media = %d\n", media);
+
+
+}*/
+
+/*DA METTERE A POSTO*/
+void main() {
+    unsigned char vettore[] = { 3,7,5 };
+    unsigned int lung = sizeof(vettore) / sizeof(vettore[0]);
+    int ris; /*0 pari, 1 dispari*/
+
+    __asm {
+        MOV EAX, lung
+        XOR BL, BL; somma
+
+        prosegui:DEC EAX
+        MOV CL, vettore[EAX]; valore
+        SHL CL, 1; per compensare quello di dx allinizio
+        
+        ciclo: SHR CL, 1
+        CMP CL, 0
+        JE nullo
+        JNE intero
+
+        nullo: DEC EAX
+        CMP EAX, 0
+        JE fine
+        JNE prosegui
+
+        intero: AND CL, 1
+        CMP CL, 1
+        JE uno
+        JMP ciclo
+        uno : ADD BL, 1
+        JMP ciclo
+
+        fine: AND BL, 1
+        MOV ris, EBX
+
+
+    }
+
+    printf("ris = %d\n", ris);
+}
