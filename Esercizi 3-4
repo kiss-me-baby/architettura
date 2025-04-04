@@ -1,26 +1,26 @@
 #include<stdio.h>
 
-/*DA FINIRE*/
 void main() {
 	char stringa[] = "questa è una stringa";
 	int lunghezza = sizeof(stringa) - 1;
-	char carattere = "è";
+	char carattere = 'è';
 	int posizione;
 
 	__asm {
-					XOR ECX, ECX; indice
-					MOV EBX, lunghezza
-					MOV AH, carattere
+					XOR EBX, EBX; indice
+					MOV ECX, lunghezza
+					MOV DL, carattere
 
-					CMP ECX, EBX
+		ciclo:			CMP EBX, ECX
 					JGE fine
 					MOV AL, stringa[EBX]
-					CMP AH, AL
+					CMP AL, DL
 					JE trovato
-					MOV stringa[EBX], stringa[EBX + 1]
+					INC EBX
+                     			JMP ciclo
 
-		fine:		MOV ECX, -1
-		trovato :	MOV posizione, ECX
+		fine:			MOV EBX, -1
+		trovato :		MOV posizione, EBX
 
 
 	}
