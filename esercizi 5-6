@@ -30,39 +30,34 @@ ciclo:          DEC EBX
 
 }*/
 
-/*DA METTERE A POSTO*/
 void main() {
-    unsigned char vettore[] = { 3,7,5 };
+    unsigned char vettore[] = {3,7,5, 1};
     unsigned int lung = sizeof(vettore) / sizeof(vettore[0]);
     int ris; /*0 pari, 1 dispari*/
 
     __asm {
-        MOV EAX, lung
-        XOR BL, BL; somma
+                    MOV EAX, lung
+                    XOR EBX, EBX; somma
 
-        prosegui:DEC EAX
-        MOV CL, vettore[EAX]; valore
-        SHL CL, 1; per compensare quello di dx allinizio
-        
-        ciclo: SHR CL, 1
-        CMP CL, 0
-        JE nullo
-        JNE intero
+        prosegui:   CMP EAX, 0
+                    JE fine
+                    DEC EAX
+                    MOV CL, vettore[EAX]; valore
+                    SHL ECX, 1; per compensare quello di dx allinizio di ciclo
 
-        nullo: DEC EAX
-        CMP EAX, 0
-        JE fine
-        JNE prosegui
+        ciclo :     SHR ECX, 1
+                    CMP ECX, 0
+                    JE prosegui
+                    JNE intero
 
-        intero: AND CL, 1
-        CMP CL, 1
-        JE uno
-        JMP ciclo
-        uno : ADD BL, 1
-        JMP ciclo
+        intero :    TEST ECX, 1
+                    JNP uno
+                    JMP ciclo
+        uno :       ADD EBX, 1
+                    JMP ciclo
 
-        fine: AND BL, 1
-        MOV ris, EBX
+        fine :      AND EBX, 1
+                    MOV ris, EBX
 
 
     }
