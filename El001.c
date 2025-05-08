@@ -27,27 +27,27 @@ void main()
 
 	__asm
 	{
-						MOV CL, 0 ;indici degli array
-						MOV DL, 0
+		MOV CL, 0; indici del vettore
+		MOV DL, 0
 
 
-		ciclo: 			MOV AL, testo[CL] ;ciclo di copia e somma dei valori nel array 
-						MOV BL, chiave[DL]
-						ADD AL, BL
-						MOV risultato[CL], AL
-						INC CL ;incremento gli indici
-						INC DL
+		ciclo: MOV AL, testo[ECX]; ciclo di copia e somma dei valori nel vettore
+			MOV BL, chiave[EDX]
+			ADD AL, BL
+			MOV risultato[ECX], AL
+			INC CL; incremento gli indici
+			INC DL
 
-						CMP testo[CL], 0 ;controllo che non sia a fine testo o chiave
-						JZ fine
-						CMP chiave[DL], 0
-						JZ nuovo_inizio
-						JMP ciclo
+			CMP testo[ECX], 0; controllo che non sia a fine testo o chiave
+			JZ fine
+			CMP chiave[EDX], 0
+			JZ nuovo_inizio
+			JMP ciclo
 
-		nuovo_inizio: 	MOV DL, 0 ;azzera indice della chiave
-						JMP ciclo
+		nuovo_inizio : MOV DL, 0; azzera indice della chiave
+			JMP ciclo
 
-		fine:
+		fine :
 
 	}
 
