@@ -27,28 +27,37 @@ void main()
 
 	__asm
 	{
-		MOV CL, 0; indici del vettore
-		MOV DL, 0
+		LEA ESI, testo; puntatore del vettore testo
+LEA EDI, risultato; puntatore del vettore risultato
+XOR EBX, EBX; indice vettore chiave
+XOR EAX, EAX; registri per la somma o sottrazione
+XOR EDX, EDX
+MOV CL, decifra
 
+ciclo : MOV DL, [ESI]; salvo nei registri i valori dei vettori
+CMP DL, 0
+JZ fine; salto alla fine se ho torvato il carattere 0 nel testo
 
-		ciclo: MOV AL, testo[ECX]; ciclo di copia e somma dei valori nel vettore
-			MOV BL, chiave[EDX]
-			ADD AL, BL
-			MOV risultato[ECX], AL
-			INC CL; incremento gli indici
-			INC DL
+MOV AL, chiave[EBX]
 
-			CMP testo[ECX], 0; controllo che non sia a fine testo o chiave
-			JZ fine
-			CMP chiave[EDX], 0
-			JZ nuovo_inizio
-			JMP ciclo
+CMP CL, 0; in base a byte decifra sommo o sottraggo
+JZ aggiungi
+JNZ togli
 
-		nuovo_inizio : MOV DL, 0; azzera indice della chiave
-			JMP ciclo
+aggiungi : ADD DL, AL
+JMP ris
 
-		fine :
+togli : SUB DL, AL
+ris : MOV[EDI], DL; salvo il valore ottenuto nel vettore risultato e incremento gli indici
+INC EDI
+INC EBX
+INC ESI
+CMP chiave[EBX], 0
+JNZ continua
+XOR EBX, EBX; azzero la chiave se sono arrivato in fondo
+continua : JMP ciclo
 
+fine : MOV[EDI], 0; aggiungo lo zero alla fine del risultato
 	}
 
 	// Stampa su video
