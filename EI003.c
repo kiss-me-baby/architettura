@@ -24,107 +24,107 @@ void main()
 
 	__asm
 	{
-		;lunghezza massima
-		XOR EAX, EAX; indice che scorre il vettore
-		XOR ECX, ECX
-		XOR EDX, EDX
-		XOR EBX, EBX
-		MOV CX, len
+		; lunghezza massima
+XOR EAX, EAX; indice che scorre il vettore
+XOR ECX, ECX; numeri di bit da considerare
+XOR EDX, EDX; numero di bit a zero da confrontare
+XOR EBX, EBX; contatore dei bit nei singoli byte del vettore
+MOV CX, len
 
-		MOV BL, vet[EAX]
+MOV BL, vet[EAX]
 
-		ciclo1: INC BH
-		CMP BH, 8
-		JE nuovo_byte1
-		TEST BL, 1
-		JNZ passo_oltre1
-		INC DL
-		SHR BL, 1
-		LOOP ciclo1
-		JMP fine1
+ciclo1: INC BH
+CMP BH, 8; verifico la fine del primo byte
+JE nuovo_byte1
+TEST BL, 1
+JNZ passo_oltre1
+INC DL; contatore di zeri in fila
+SHR BL, 1
+LOOP ciclo1
+JMP fine1
 
-		passo_oltre1 : SHR BL, 1
-		CMP DH, DL
-		JB da_cambiare1
-		JMP intatto1
+passo_oltre1 : SHR BL, 1; 1 come ultimo bit, e sposto i bit
+CMP DH, DL
+JB da_cambiare1
+JMP intatto1
 
-		da_cambiare1 : MOV DH, DL
-		intatto1 : XOR DL, DL
-		LOOP ciclo1
-		JMP fine1
+da_cambiare1 : MOV DH, DL; inverto i registri se ottengo seguenza maggiore
+intatto1 : XOR DL, DL
+LOOP ciclo1
+JMP fine1
 
-		nuovo_byte1 : XOR BH, BH
-		INC EAX
-		MOV BL, vet[EAX]
-		JMP ciclo1
+nuovo_byte1 : XOR BH, BH; passo al byte successivo
+INC EAX
+MOV BL, vet[EAX]
+JMP ciclo1
 
-		fine1 : CMP DH, DL
-		JB basso1
-		JMP alto1
+fine1 : CMP DH, 0
+JZ esci1
 
-		basso1: XOR DH, DH
-		MOV maxLung, DX
-		JMP esci1
+XCHG DL, DH; scambio i registri per avere la sequenza in offset minore
+XOR DH, DH
 
-		alto1: XCHG DL, DH
-		XOR DH, DH
-		MOV maxLung, DX
+esci1 : CMP DL, 0
+JE nulla1
+MOV maxLung, DX
+JMP basta1
 
-		esci1:
+nulla1 : MOV maxLung, -1; non ci sono zeri
 
-		;lunghezza minima
-		XOR EAX, EAX; indice che scorre il vettore
-		XOR ECX, ECX
-		XOR EDX, EDX
-		XOR EBX, EBX
-		MOV CX, len
+basta1 :
 
-		MOV BL, vet[EAX]
+; lunghezza minima
+XOR EAX, EAX; indice che scorre il vettore
+XOR ECX, ECX; numeri di bit da considerare
+XOR EDX, EDX; numero di bit a zero da confrontare
+XOR EBX, EBX; contatore dei bit nei singoli byte del vettore
+MOV CX, len
 
-		ciclo2: INC BH
-		CMP BH, 8
-		JE nuovo_byte2
-		TEST BL, 1
-		JNZ passo_oltre2
-		INC DL
-		SHR BL, 1
-		LOOP ciclo2
-		JMP fine2
+MOV BL, vet[EAX]
 
-		passo_oltre2 : SHR BL, 1
+ciclo2: INC BH
+CMP BH, 8; verifico la fine del primo byte
+JE nuovo_byte2
+TEST BL, 1
+JNZ passo_oltre2
+INC DL; contatore di zeri in fila
+SHR BL, 1
+LOOP ciclo2
+JMP fine2
 
-		CMP DL, 0
-		JZ intatto2
-		CMP DH, 0
-		JZ da_cambiare2
-		CMP DH, DL
-		JA da_cambiare2
-		JMP intatto2
+passo_oltre2 : SHR BL, 1; 1 come ultimo bit, e sposto i bit
+CMP DL, 0
+JZ intatto2
+CMP DH, 0
+JZ da_cambiare2
+CMP DH, DL
+JA da_cambiare2
+JMP intatto2
 
-		da_cambiare2 : MOV DH, DL
-		intatto2 : XOR DL, DL
-		LOOP ciclo2
-		JMP fine2
+da_cambiare2 : MOV DH, DL; inverto i registri se ottengo seguenza maggiore
+intatto2 : XOR DL, DL
+LOOP ciclo2
+JMP fine2
 
-		nuovo_byte2 : XOR BH, BH
-		INC EAX
-		MOV BL, vet[EAX]
-		JMP ciclo2
+nuovo_byte2 : XOR BH, BH; passo al byte successivo
+INC EAX
+MOV BL, vet[EAX]
+JMP ciclo2
 
-		fine2 : CMP DH, 0
-		JZ esci2
-		
-		XCHG DL, DH
-		XOR DH, DH
-		
-		esci2: CMP DL, 0
-		JE nulla
-		MOV minLung, DX
-		JMP basta
+fine2 : CMP DH, 0
+JZ esci2
 
-		nulla: MOV minLung, -1
+XCHG DL, DH; scambio i registri per avere la sequenza in offset minore
+XOR DH, DH
 
-		basta:
+esci2: CMP DL, 0
+JE nulla2
+MOV minLung, DX
+JMP basta2
+
+nulla2: MOV minLung, -1; non ci sono zeri
+
+basta2:
 		
 
 	}
