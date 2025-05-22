@@ -56,7 +56,7 @@ JMP fine1
 nuovo_byte1 : XOR BH, BH; passo al byte successivo
 INC EAX
 MOV BL, vet[EAX]
-JMP ciclo1
+LOOP ciclo1
 
 fine1 : CMP DH, 0
 JZ esci1
@@ -109,24 +109,54 @@ JMP fine2
 nuovo_byte2 : XOR BH, BH; passo al byte successivo
 INC EAX
 MOV BL, vet[EAX]
-JMP ciclo2
+LOOP ciclo2
 
-fine2 : CMP DH, 0
+/*fine2 : CMP DH, 0
 JZ esci2
 
-XCHG DL, DH; scambio i registri per avere la sequenza in offset minore
-XOR DH, DH
+CMP DL, DH
+JB basso2
+scambia2: XCHG DL, DH; scambio i registri per avere la sequenza in offset minore
+JMP stampa
 
 esci2: CMP DL, 0
 JE nulla2
+basso2: CMP DL, 0
+JZ scambia2
+stampa: XOR DH, DH
 MOV minLung, DX
 JMP basta2
 
 nulla2: MOV minLung, -1; non ci sono zeri
 
-basta2:
-		
+basta2:*/
 
+fine2:
+CMP DH, 0
+	JZ esci2; se nessuna sequenza salvata
+
+	CMP DL, DH
+	JB scambia2; se DL < DH → è la sequenza minima → scambia
+	JMP stampa; altrimenti stampa DH come minimo
+
+	esci2 :
+CMP DL, 0
+	JE nulla2; nessuna sequenza
+	JMP stampa; altrimenti usa DL
+
+	scambia2 :
+XCHG DL, DH; scambia per avere DL come minimo
+
+	stampa :
+XOR DH, DH; azzera DH per sicurezza
+	MOV minLung, DX; salva la lunghezza minima trovata
+	JMP basta2
+
+	nulla2 :
+MOV minLung, -1; nessuna sequenza di 0 trovata
+
+	basta2 :
+		
 	}
 
 	// Stampa su video
