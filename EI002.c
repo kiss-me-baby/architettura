@@ -20,46 +20,49 @@ void main()
 
 	// Output
 	unsigned int triangolo[1024];	// risultato: il vettore contiene i numeri del 
-									// triangolo dal livello 0 al più alto richiesto
+	// triangolo dal livello 0 al più alto richiesto
 
 	unsigned int i;
 	unsigned int k = 0;
 
-	__asm
-	{
-		LEA ESI, triangolo
-		MOV EAX, 0 ;contatore dei livelli
-		MOV [ESI], 1 ;livello 0 impostato di default
+	__asm{
+		MOV EAX, 0; contatore dei livelli
+		XOR EDX, EDX
+		MOV triangolo[EDX], 1; livello 0 impostato di forza
 
 		CMP EAX, livello
 		JE fine
 
-		INC ESI ;livello 1 
-		MOV [ESI], 1 
-		INC [ESI], 1
-		MOV [ESI], 1
+		ADD EDX, 4; livello 1
+		MOV triangolo[EDX], 1
+		ADD EDX, 4
+		MOV triangolo[EDX], 1
 
 		ciclo_esterno: CMP EAX, livello
 		JE fine
-		INC EAX ;cambio di livello
-		INC ESI
-		MOV [ESI], 1 ;salvo 1 nella prima pozione
+		INC EAX; cambio di livello
+		ADD EDX, 4
+		MOV triangolo[EDX], 1; salvo 1 nella prima pozione
 		MOV ECX, EAX
-		DEC ECX, 1 ;numero di volte da aggiungere un numero nel mezzo del vettore di quel livello
-		
-		ciclo_interno: INC ESI
-		MOV EBX, ESI
-		SUB EBX, EAX ;indice del primo elemento per ottenere il nuovo numero
-		MOV EDX, triangolo[EBX]
-		ADD EDX, triangolo[EBX-1] ;somma dei numeri in posizione indice-livello e indice-livello-1
-		MOV ESI, EDX
+		DEC ECX; numero di volte da aggiungere un numero nel mezzo del vettore di quel livello
+
+		ciclo_interno :
+		ADD EDX, 4
+		MOV EBX, EDX
+		PUSH EAX
+		IMUL AX, 4
+		SUB EBX, EAX; indice del primo elemento per ottenere il nuovo numero 
+		XOR EAX, EAX
+		MOV EAX, triangolo[EBX]
+		ADD EAX, triangolo[EBX - 4]; somma dei numeri in posizione indice - livello e indice - livello - 1
+		MOV triangolo[EDX], EAX
+		POP EAX
 		LOOP ciclo_interno
-		INC ESI ;posizone ultimo 1 del livello corrente
-		MOV [ESI], 1
-		JMP ciclo_esterno ;salto al nuovo livello
+		ADD EDX, 4; posizone ultimo 1 del livello corrente
+		MOV triangolo[EDX], 1
+		JMP ciclo_esterno; salto al nuovo livello
 
-		fine:
-
+		fine :
 
 	}
 
@@ -73,5 +76,3 @@ void main()
 		printf("\n");
 	}
 }
-
-
