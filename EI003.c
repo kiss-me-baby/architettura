@@ -32,75 +32,90 @@ XOR EBX, EBX; BH = contatore bit, BL = byte corrente
 
 MOV BL, vet[EAX]; carica il primo byte
 
-ciclo :
+inizio :
 MOV AL, BH
-	CMP AX, len; fine dei bit ?
-	JE L0
+	CMP AX, len; fine dei bit
+	JE fine
 	CMP BH, 0
 	JZ salta
-	TEST BH, 7; fine byte ?
+	TEST BH, 7; fine byte
 	JZ nuovo_byte
 
 	salta :
 INC BH
 
-	prova :
 	TEST BL, 1
 	JNZ passo_oltre
 	INC DH; incremento sequenza zeri
 	SHR BL, 1
-	JMP ciclo
+	JMP inizio
 
 	passo_oltre :
-SHR BL, 1; scorro bit
+	CMP DL, DH; confronta con max
+	JB aumento
+	JMP L1
 
-	L0 :
-CMP DL, DH; confronta con max
-	JB L1
-	JMP L2
-
-	L1 :
+	aumento :
 MOV DL, DH; aggiorna max
 
-	L2 :
+	L1 :
 CMP CL, 0
-	JZ L3
+	JZ per_forza
 	CMP DH, 0
 	JZ continua
 	CMP CL, DH; confronta con min
 	JB continua
 
-	L3 :
+	per_forza :
 MOV CL, DH; aggiorna min
 
 	continua :
 XOR DH, DH
-	MOV AL, BH
-	CMP AX, len; fine dei bit ?
-	JE fine
-	JMP ciclo
+	SHR BL, 1; scorro bit
+	JMP inizio
 
 	nuovo_byte :
-INC CH; passo al byte
-	MOV AL, CH
+MOV AL, BH; passo al byte successivo
+	SHR AL, 3; AL = BH / 8
+	MOVZX EAX, AL; estende AL a EAX
 	MOV BL, vet[EAX]
-    INC BH
-	MOV AL, BH
-	CMP AX, len; fine dei bit ?
-	JE L0
-	JMP prova
+	JMP salta
 
 	fine :
-CMP DL, 0
-	JZ esci
+CMP DL, DH; confronta con max
+	JB cresce
+	JMP L11
 
+	cresce :
+MOV DL, DH; aggiorna max
+
+	L11 :
+CMP CL, 0
+	JZ per_forza1
+	CMP DH, 0
+	JZ continua1
+	CMP CL, DH; confronta con min
+	JB continua1
+
+	per_forza1 :
+MOV CL, DH; aggiorna min
+
+	continua1 :
+XOR DH, DH
 	XOR CH, CH
-	MOV maxLung, DX
+	CMP DL, 0
+	JNZ salvataggio_finale
+	CMP CL, 0
+	JNZ salvataggio_finale
+	JMP esci
+
+	salvataggio_finale :
+MOV maxLung, DX
 	MOV minLung, CX
 	JMP basta
 
 	esci :
-	MOV maxLung, -1; caso senza zeri
+MOV maxLung, -1; caso senza zeri
 	MOV minLung, -1
 
 	basta :
@@ -111,78 +126,3 @@ CMP DL, 0
 	printf("Lunghezza massima delle sotto-sequenze di 0: %d\n", maxLung);
 }
 
-/*XOR EAX, EAX              ; indice nel vettore
-    XOR ECX, ECX              ; CL = minLung
-    XOR EDX, EDX              ; DL = maxLung
-    XOR EBX, EBX              ; BH = contatore bit, BL = byte corrente
-
-    MOV BL, vet[EAX]          ; carica primo byte
-    MOV CX, len               ; numero di bit da analizzare
-
-ciclo:
-    CMP BH, CX
-    JE fine                   ; se letti tutti i bit, esci
-
-    CMP BH, 0
-    JZ salta
-    TEST BH, 7
-    JZ nuovo_byte             ; ogni 8 bit → nuovo byte
-
-salta:
-    INC BH                    ; incrementa contatore bit
-
-prova:
-    TEST BL, 1
-    JNZ passo_oltre           ; bit = 1 → fine sequenza zeri
-
-    INC DH                    ; conta zeri consecutivi
-    SHR BL, 1                 ; prossimo bit
-    JMP ciclo
-
-passo_oltre:
-    SHR BL, 1
-
-    CMP DL, DH
-    JB L1                     ; aggiorna max se DH > DL
-    JMP L2
-
-L1:
-    MOV DL, DH
-
-L2:
-    CMP CL, 0
-    JZ L3
-    CMP DH, 0
-    JZ continua
-    CMP CL, DH
-    JB continua
-
-L3:
-    MOV CL, DH                ; aggiorna min se serve
-
-continua:
-    XOR DH, DH                ; reset contatore zeri
-    CMP BH, CX
-    JE fine
-    JMP ciclo
-
-nuovo_byte:
-    INC EAX                   ; byte successivo
-    MOV BL, vet[EAX]
-    INC BH
-    JMP prova
-
-fine:
-    CMP DL, 0
-    JZ esci                   ; se nessuno zero trovato
-
-    XOR CH, CH
-    MOV word ptr [maxLung], DX
-    MOV word ptr [minLung], CX
-    JMP basta
-
-esci:
-    MOV word ptr [maxLung], -1
-    MOV word ptr [minLung], -1
-
-basta:*/
